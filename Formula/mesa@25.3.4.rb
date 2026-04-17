@@ -112,11 +112,18 @@ class MesaAT2534 < Formula
     #    with mesa's macro. Including OptionUtils.h before mesa headers resolves it.
     # 2. Driver::GetResourcesPath was moved to clang::GetResourcesPath in LLVM 22.
     inreplace "src/compiler/clc/clc_helpers.cpp" do |s|
+      # Undef UNUSED before clang headers to avoid conflict with OffloadArch.h in LLVM 22
+      s.sub!(
+        "#include <clang/Config/config.h>",
+        "#undef UNUSED\n#include <clang/Config/config.h>"
+      )
+      # Add OptionUtils.h include for LLVM 22
       s.sub!(
         /#if LLVM_VERSION_MAJOR >= 20\n#include <llvm\/Support\/VirtualFileSystem\.h>\n#endif/,
         "#if LLVM_VERSION_MAJOR >= 20\n#include <llvm/Support/VirtualFileSystem.h>\n#endif\n\n" \
         "#if LLVM_VERSION_MAJOR >= 22\n#include <clang/Options/OptionUtils.h>\n#endif"
       )
+      # Fix GetResourcesPath for LLVM 22
       s.sub!(
         /#if LLVM_VERSION_MAJOR >= 20\n      Driver::GetResourcesPath\(std::string\(clang_path\)\);/,
         "#if LLVM_VERSION_MAJOR >= 22\n      clang::GetResourcesPath(std::string(clang_path));\n" \
