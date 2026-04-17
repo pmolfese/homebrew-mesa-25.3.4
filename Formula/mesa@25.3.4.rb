@@ -102,24 +102,36 @@ class MesaAT2534 < Formula
     sha256 "d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f"
   end
 
-  # Inline patch for LLVM 22 compatibility in clc_helpers.cpp.
-  # Upstream commits dc03f94 and 1db77d08 — the createDiagnostics fix is
-  # already present in 25.3.4, so only the GetResourcesPath + OptionUtils
-  # hunk is needed here.
-  patch :DATA
-
   def python3
     "python3.13"
   end
 
   def install
+    # Fix LLVM 22 API incompatibilities in clc_helpers.cpp.
+    # 1. OffloadArch.h in LLVM 22 uses UNUSED as an enum value, which conflicts
+    #    with mesa's macro. Including OptionUtils.h before mesa headers resolves it.
+    # 2. Driver::GetResourcesPath was moved to clang::GetResourcesPath in LLVM 22.
+    inreplace "src/compiler/clc/clc_helpers.cpp" do |s|
+      s.sub!(
+        "#if LLVM_VERSION_MAJOR >= 20\n#include <llvm/Support/VirtualFileSystem.h>\n#endif",
+        "#if LLVM_VERSION_MAJOR >= 20\n#include <llvm/Support/VirtualFileSystem.h>\n#endif\n\n" \
+        "#if LLVM_VERSION_MAJOR >= 22\n#include <clang/Options/OptionUtils.h>\n#endif"
+      )
+      s.sub!(
+        "#if LLVM_VERSION_MAJOR >= 20\n      Driver::GetResourcesPath(std::string(clang_path));",
+        "#if LLVM_VERSION_MAJOR >= 22\n      clang::GetResourcesPath(std::string(clang_path));\n" \
+        "#elif LLVM_VERSION_MAJOR >= 20\n      Driver::GetResourcesPath(std::string(clang_path));"
+      )
+    end
+
+    # Work around superenv to avoid mixing `expat` usage in libraries across dependency tree.
     if OS.mac? && MacOS.version < :sequoia
       env_vars = %w[CMAKE_PREFIX_PATH HOMEBREW_INCLUDE_PATHS HOMEBREW_LIBRARY_PATHS PATH PKG_CONFIG_PATH]
       ENV.remove env_vars, /(^|:)#{Regexp.escape(Formula["expat"].opt_prefix)}[^:]*/
       ENV.remove "HOMEBREW_DEPENDENCIES", "expat"
     end
 
-    # Ensure all X11/XCB deps are visible to pkg-config
+    # Ensure X11/XCB deps are visible to pkg-config
     ENV.append_path "PKG_CONFIG_PATH", Formula["libxshmfence"].opt_lib/"pkgconfig"
     ENV.append_path "PKG_CONFIG_PATH", Formula["libxrandr"].opt_lib/"pkgconfig"
     ENV.append_path "PKG_CONFIG_PATH", Formula["libxrender"].opt_lib/"pkgconfig"
@@ -212,31 +224,3 @@ class MesaAT2534 < Formula
     system ENV.cc, "glxgears.c", "-o", "gears", *flags, "-lm"
   end
 end
-
-__END__
---- a/src/compiler/clc/clc_helpers.cpp
-+++ b/src/compiler/clc/clc_helpers.cpp
-@@ -66,7 +66,11 @@
- #if LLVM_VERSION_MAJOR >= 20
- #include <llvm/Support/VirtualFileSystem.h>
- #endif
- 
-+#if LLVM_VERSION_MAJOR >= 22
-+#include <clang/Options/OptionUtils.h>
-+#endif
-+
- #include "util/macros.h"
- #include "util/u_dl.h"
- #include "glsl_types.h"
-@@ -915,7 +919,9 @@
-    // GetResourcePath is a way to retrieve the actual libclang resource dir based on a given binary
-    // or library.
-    auto tmp_res_path =
--#if LLVM_VERSION_MAJOR >= 20
-+#if LLVM_VERSION_MAJOR >= 22
-+      clang::GetResourcesPath(std::string(clang_path));
-+#elif LLVM_VERSION_MAJOR >= 20
-       Driver::GetResourcesPath(std::string(clang_path));
- #else
-       Driver::GetResourcesPath(std::string(clang_path), CLANG_RESOURCE_DIR);
-
