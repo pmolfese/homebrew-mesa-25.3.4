@@ -34,6 +34,8 @@ class MesaAT253 < Formula
   
   depends_on "libxshmfence" => :build
   depends_on "xcb-util-keysyms"
+  depends_on "libxrandr" => :build
+  
   
 
   depends_on "libclc" # OpenCL support needs share/clc/*.bc files at runtime
