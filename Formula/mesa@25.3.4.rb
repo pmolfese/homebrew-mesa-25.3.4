@@ -124,14 +124,18 @@ class MesaAT2534 < Formula
         "#if LLVM_VERSION_MAJOR >= 22\n" \
         "#include <clang/Options/OptionUtils.h>\n" \
         "#endif\n" \
+        "#pragma push_macro(\"UNUSED\")\n" \
+        "#pragma push_macro(\"ASSERTED\")\n" \
         "#undef UNUSED\n" \
+        "#undef ASSERTED\n" \
         "#include <clang/Config/config.h>"
       )
       # Fix GetResourcesPath API change in LLVM 22
       s.sub!(
-        /#if LLVM_VERSION_MAJOR >= 20\n      Driver::GetResourcesPath\(std::string\(clang_path\)\);/,
-        "#if LLVM_VERSION_MAJOR >= 22\n      clang::GetResourcesPath(std::string(clang_path));\n" \
-        "#elif LLVM_VERSION_MAJOR >= 20\n      Driver::GetResourcesPath(std::string(clang_path));"
+        /#if LLVM_VERSION_MAJOR >= 20\n#include <llvm\/Support\/VirtualFileSystem\.h>\n#endif/,
+        "#if LLVM_VERSION_MAJOR >= 20\n#include <llvm/Support/VirtualFileSystem.h>\n#endif\n" \
+        "#pragma pop_macro(\"ASSERTED\")\n" \
+        "#pragma pop_macro(\"UNUSED\")"
       )
     end
 
