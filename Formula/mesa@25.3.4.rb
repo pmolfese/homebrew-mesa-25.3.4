@@ -131,7 +131,7 @@ class MesaAT2534 < Formula
       )
       s.sub!(
         "#include <clang/Config/config.h>",
-        "#undef UNUSED\n#undef ASSERTED\n#include <clang/Config/config.h>"
+        "#undef UNUSED\n#include <clang/Config/config.h>"
       )
     end
 
