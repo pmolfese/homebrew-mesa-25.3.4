@@ -1,4 +1,4 @@
-class MesaAT253 < Formula
+class MesaAT2534 < Formula
   include Language::Python::Virtualenv
 
   desc "Graphics Library"
@@ -20,28 +20,15 @@ class MesaAT253 < Formula
     { "GPL-1.0-or-later" => { with: "Linux-syscall-note" } }, # include/drm-uapi/sync_file.h
     { "GPL-2.0-only" => { with: "Linux-syscall-note" } }, # include/drm-uapi/{d3dkmthk.h,dma-buf.h,etnaviv_drm.h}
   ]
-  head "https://gitlab.freedesktop.org/mesa/mesa.git", branch: "main"
-
-  bottle do
-    sha256 arm64_tahoe:   "ffa615e47150df39d68fdc678adef3b6d9b1827fb2b61d7fd6fc35d0c05f0369"
-    sha256 arm64_sequoia: "51a93e14311c08b78becacf1c2b7c761f99b25ca392af5cf9fcd541c6ba46327"
-    sha256 arm64_sonoma:  "358291feef5ea478c512ba017b05ea03d7a889c77d6ec87f9765a3e4ff56b5fa"
-    sha256 sonoma:        "db1620d5eeb4b23100bea86a5251d6f241a5186b45ffa9dc64dec5d7586520ae"
-    sha256 arm64_linux:   "556752f81c7e61a8e6b66e36198b85905a0202800cf5a7d3697d80f297f1afe7"
-    sha256 x86_64_linux:  "797427d3600d79309ee50049e4b8573359caa5b260776af2fda07fcaf7aa9210"
-  end
 
   depends_on "bindgen" => :build
   depends_on "bison" => :build # can't use from macOS, needs '> 2.3'
   depends_on "glslang" => :build
-  depends_on "libxrandr" => :build
-  depends_on "libxrender" => :build
-  depends_on "libxshmfence" => :build
   depends_on "libyaml" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkgconf" => [:build, :test]
-  depends_on "python@3.14" => :build
+  depends_on "python@3.13" => :build
   depends_on "rust" => :build
   depends_on "xorgproto" => :build
 
@@ -68,6 +55,9 @@ class MesaAT253 < Formula
     depends_on "directx-headers" => :build
     depends_on "gzip" => :build
     depends_on "libva" => :build
+    depends_on "libxrandr" => :build
+    depends_on "libxrender" => :build
+    depends_on "libxshmfence" => :build
     depends_on "pycparser" => :build
     depends_on "valgrind" => :build
     depends_on "wayland-protocols" => :build
@@ -84,9 +74,6 @@ class MesaAT253 < Formula
       depends_on "cbindgen" => :build
     end
   end
-
-  pypi_packages package_name:   "",
-                extra_packages: %w[mako packaging ply pyyaml]
 
   resource "mako" do
     url "https://files.pythonhosted.org/packages/9e/38/bd5b78a920a64d708fe6bc8e0a2c075e1389d53bef8413725c63ba041535/mako-1.3.10.tar.gz"
@@ -114,7 +101,7 @@ class MesaAT253 < Formula
   end
 
   def python3
-    "python3.14"
+    "python3.13"
   end
 
   def install
