@@ -105,11 +105,6 @@ class MesaAT2534 < Formula
   end
 
   patch do
-    url "https://gitlab.freedesktop.org/mesa/mesa/-/commit/1db77d08e22e676bbc34e411313445868e9fd836.diff"
-    sha256 "c3d0cdd89e021502a535ce5bb751f7d63c39bc531b2beb0c7efda12e76171e57"
-  end
-
-  patch do
     url "https://gitlab.freedesktop.org/mesa/mesa/-/commit/dc03f94e070900365cc1ad91437db178d4d40573.diff"
     sha256 "fb230a96e537dbbfa60dff17e568d6189cd71f8dbd74f557de40c6e4d876ed39"
   end
