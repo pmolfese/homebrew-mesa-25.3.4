@@ -31,6 +31,10 @@ class MesaAT253 < Formula
   depends_on "python@3.13" => :build
   depends_on "rust" => :build
   depends_on "xorgproto" => :build
+  
+  depends_on "libxshmfence" => :build
+  depends_on "xcb-util-keysyms"
+  
 
   depends_on "libclc" # OpenCL support needs share/clc/*.bc files at runtime
   depends_on "libpng"
