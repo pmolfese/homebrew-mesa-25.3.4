@@ -109,6 +109,13 @@ INSTALLDIR = $(SYSTEM_NAME)
 # separating for now in case OMP goes back to a separate directory
 BREWLIBDIR = /opt/homebrew/lib
 BREWINCDIR = /opt/homebrew/include
+MESA_LIBDIR = /opt/homebrew/opt/mesa@25.3.4/lib
+MESA_INCDIR = /opt/homebrew/opt/mesa@25.3.4/include
+
+LFLAGS = -L. -L$(MESA_LIBDIR) -L$(BREWLIBDIR) $(XROOT_L) -L/usr/lib $(LPYTHON)
+IFLAGS = -I. -I$(MESA_INCDIR) -I$(BREWINCDIR) $(XROOT_I) -I/usr/include
+
+
 
 # EXTRA_INSTALL_FILES = $(BREWLIBDIR)/libXm.4.dylib			  \
 # 		      $(BREWLIBDIR)/libjpeg.9.dylib			          \
@@ -141,10 +148,13 @@ EXTRA_INSTALL_COMMANDS = ( cd $(INSTALLDIR) ;                                 \
                            chmod u+w *.dylib ;                                \
                            if [ -d $(HOME)/EXTRAPROGS ]; then $(CP) $(HOME)/EXTRAPROGS/* . ; fi ; )
 
-IFLAGS = -I. -I$(BREWINCDIR) $(XROOT_I) -I/usr/include
+# IFLAGS = -I. -I$(BREWINCDIR) $(XROOT_I) -I/usr/include
          
 # LFLAGS = -L. -L$(BREWLIBDIR) $(XROOT_L) -L/usr/lib -Wl,-x -Wl,-multiply_defined -Wl,warning -Wl,-bind_at_load $(LPYTHON)
-LFLAGS = -L. -L$(BREWLIBDIR) $(XROOT_L) -L/usr/lib $(LPYTHON)
+# LFLAGS = -L. -L$(BREWLIBDIR) $(XROOT_L) -L/usr/lib $(LPYTHON)
+
+LFLAGS = -L. -L$(MESA_LIBDIR) -L$(BREWLIBDIR) $(XROOT_L) -L/usr/lib $(LPYTHON)
+IFLAGS = -I. -I$(MESA_INCDIR) -I$(BREWINCDIR) $(XROOT_I) -I/usr/include
 
 CCSVD  = $(CCMIN) -m64 -O0
 
